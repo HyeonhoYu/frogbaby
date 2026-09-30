@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Frog Baby 3D: Ball State's Little Touch of Luck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --page:#E6F1F4; --panel:#FFFFFF; --ink:#43302A; --soft:#6E5A50;
+  --cardinal:#B42A3A; --pond:#3F8F5A; --line:#CFDDE2;
+  --display:"Baloo 2","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--page:#152A33;--panel:#1E3640;--ink:#F3E8DF;--soft:#C8B8AD;--line:#2F4C57;--cardinal:#E0566A;--pond:#7FCB8F;}
+}
+:root[data-theme="dark"]{--page:#152A33;--panel:#1E3640;--ink:#F3E8DF;--soft:#C8B8AD;--line:#2F4C57;--cardinal:#E0566A;--pond:#7FCB8F;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--body);}
+.wrap{max-width:1100px;margin:0 auto;padding:16px 16px 28px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+header h1{font-family:var(--display);font-weight:800;font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0;line-height:1.1}
+header h1 small{display:block;font-family:var(--body);font-weight:500;font-size:.95rem;color:var(--soft)}
+.toggles{display:flex;gap:8px;flex-wrap:wrap}
+button{font-family:var(--body);font-weight:700;font-size:1rem;cursor:pointer;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:8px 16px}
+button:hover{border-color:var(--pond)}
+button:focus-visible{outline:3px solid var(--cardinal);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+button[aria-pressed="true"]{background:var(--pond);border-color:var(--pond);color:#fff}
+.theater{position:relative;aspect-ratio:16/9;border-radius:28px;overflow:hidden;background:linear-gradient(#CFE6F0,#F2F8FA);transition:background .6s;box-shadow:0 10px 0 rgba(63,143,90,.25)}
+.theater canvas{display:block;width:100%!important;height:100%!important}
+#fade{position:absolute;inset:0;background:#FFFDF8;opacity:0;pointer-events:none;transition:opacity .28s}
+#fade.on{opacity:1}
+.badge{position:absolute;top:4%;left:3%;font-family:var(--display);font-weight:800;font-size:clamp(1rem,3vw,2rem);background:#FFF8EC;color:#6B4632;border-radius:18px;padding:.1em .6em;transform:rotate(-3deg);opacity:0;transition:opacity .5s;box-shadow:0 4px 0 rgba(107,70,50,.15)}
+.badge.on{opacity:1}
+.titlecard{position:absolute;left:5%;top:28%;width:40%;pointer-events:none;opacity:0;transition:opacity .6s}
+.titlecard.on{opacity:1}
+.titlecard .big{font-family:var(--display);font-weight:800;color:#6B4632;font-size:clamp(2.2rem,8vw,5.6rem);line-height:.92;text-shadow:0 4px 0 rgba(255,255,255,.7)}
+.titlecard .sub{font-family:var(--display);font-weight:600;color:#6B4632;font-size:clamp(.9rem,2.2vw,1.5rem);margin-top:.3em}
+.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(230,241,244,.5);backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.card{background:#FFFDF8;color:#43302A;border-radius:24px;padding:clamp(16px,3vw,32px);max-width:min(560px,90%);text-align:center;box-shadow:0 8px 0 rgba(107,70,50,.18)}
+.card h2{font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3.2vw,2rem);margin:0 0 6px;line-height:1.15}
+.card p{margin:0 0 14px;font-size:clamp(.95rem,2vw,1.1rem)}
+.card button{background:#3F8F5A;border-color:#3F8F5A;color:#fff;font-size:1.1rem;padding:10px 22px;margin:4px}
+.opts{display:grid;gap:8px;margin:12px 0}
+.opts button{background:#fff;color:#43302A;border-color:#CFDDE2;border-radius:16px;text-align:left;margin:0}
+.opts button.right{background:#DDF1E1;border-color:#3F8F5A}
+.opts button.wrong{background:#F8DDE0;border-color:#B42A3A}
+.feedback{min-height:1.5em;font-weight:700}
+.endbtns{position:absolute;left:0;right:0;bottom:6%;display:none;justify-content:center;gap:10px}
+.endbtns.on{display:flex}
+.endbtns button{background:#3F8F5A;border-color:#3F8F5A;color:#fff;font-size:1.05rem}
+.endbtns button.ghost{background:#fff;color:#43302A;border-color:#fff}
+.caption{min-height:4.8em;margin:14px 0 10px;background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:14px 20px;font-size:clamp(1.05rem,2.2vw,1.3rem);line-height:1.5}
+.controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dots{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.dots button{width:16px;height:16px;padding:0;border-radius:50%;border-width:2px}
+.dots button[aria-current="true"]{background:var(--cardinal);border-color:var(--cardinal)}
+.src{margin-top:18px;font-size:.88rem;color:var(--soft);line-height:1.5}
+#err{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;padding:20px;font-weight:700;color:#6B4632}
+@media (max-width:600px){.dots{margin-left:0;width:100%}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Frog Baby<small id="tagline"></small></h1>
+    <div class="toggles">
+      <button id="bEn" aria-pressed="true">English</button>
+      <button id="bKo" aria-pressed="false">한국어</button>
+      <button id="bVoice" aria-pressed="true"></button>
+    </div>
+  </header>
+
+  <div class="theater" id="theater">
+    <div id="err">This story needs WebGL. Try opening it in Chrome, Edge, or Safari.</div>
+    <div id="fade"></div>
+    <div class="badge" id="badge"></div>
+    <div class="titlecard" id="titlecard"><div class="big">Frog Baby</div><div class="sub" id="titleSub"></div></div>
+    <div class="endbtns" id="endbtns"><button id="bQuiz"></button><button class="ghost" id="bReplay"></button></div>
+    <div class="overlay on" id="start"><div class="card"><h2 id="startH"></h2><p id="startP"></p><button id="bStart"></button></div></div>
+    <div class="overlay" id="quiz"><div class="card" role="dialog" aria-labelledby="qText">
+      <h2 id="qCount"></h2><p id="qText"></p><div class="opts" id="qOpts"></div>
+      <div class="feedback" id="qFeed" aria-live="polite"></div><button id="qNext" style="display:none"></button>
+    </div></div>
+  </div>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+  <nav class="controls" aria-label="Story controls">
+    <button id="bPrev"></button><button id="bPlay"></button><button id="bNext"></button>
+    <div class="dots" id="dots"></div>
+  </nav>
+  <p class="src" id="src"></p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="story.js"></script>
+<script>
+/* ---------- per-scene staging: backdrop, camera, and acting beats ----------
+   beats: [seconds from scene start, face, action]
+   faces: happy, open, giggle, surprised, sad, worried, proud
+   actions: idle, wave, hop, cheer, shiver, wiggle, droop, spin, look, bow, flinch, pop, sway, nod */
+const STAGE = [
+  {bg:"linear-gradient(#CDE7F1,#F4FAFB)", cam:"title", beats:[[0,"happy","wave"],[3.2,"open","hop"],[5.8,"giggle","sway"]]},
+  {bg:"linear-gradient(#F3E6D2,#E8D6BE)", cam:"mid",   beats:[[0,"happy","pop"],[1.4,"open","look"],[5.5,"giggle","sway"]]},
+  {bg:"linear-gradient(#E4DFEE,#D6CFE3)", cam:"mid",   beats:[[0,"open","look"],[3.2,"proud","sway"]]},
+  {bg:"linear-gradient(#E4DFEE,#D6CFE3)", cam:"close", beats:[[0,"surprised","idle"],[1.1,"giggle","wiggle"]]},
+  {bg:"linear-gradient(#E4DFEE,#D6CFE3)", cam:"close", beats:[[0,"worried","look"],[2.2,"sad","droop"]]},
+  {bg:"linear-gradient(#BFE0F0,#EAF6FA)", cam:"wide",  beats:[[0,"surprised","idle"],[0.9,"giggle","spin"],[2.6,"happy","hop"]]},
+  {bg:"linear-gradient(#BFE0F0,#EAF6FA)", cam:"frogs", beats:[[0,"open","look"],[3.4,"giggle","sway"]]},
+  {bg:"linear-gradient(#C9D6E0,#EEF2F5)", cam:"mid",   beats:[[0,"worried","shiver"],[3.6,"happy","sway"]]},
+  {bg:"linear-gradient(#BFE0F0,#EAF6FA)", cam:"mid",   beats:[[0,"open","cheer"],[3,"giggle","cheer"]]},
+  {bg:"linear-gradient(#C9D6E0,#EEF2F5)", cam:"midR",  beats:[[0,"surprised","flinch"],[2.6,"sad","droop"]]},
+  {bg:"linear-gradient(#BFE0F0,#F6EFD8)", cam:"wide",  beats:[[0,"happy","spin"],[2,"giggle","cheer"]]},
+  {bg:"linear-gradient(#CDE7F1,#F4FAFB)", cam:"title", beats:[[0,"happy","wave"],[3.6,"proud","bow"],[5.6,"happy","wave"]]}
+];
+
+const $ = id => document.getElementById(id);
+let lang = "en", voice = true, idx = 0, playing = false, timer = null, token = 0;
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* recorded voice pack (audio/manifest.json next to this page); falls back to the device voice */
+let pack = null;
+fetch("audio/manifest.json", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(m => { if (m && m.files) pack = m; }).catch(() => {});
+const pad2 = n => String(n).padStart(2, "0");
+
+/* ================= 3D ================= */
+const ok3d = (() => { try { const c = document.createElement("canvas"); return !!(window.THREE && (c.getContext("webgl2") || c.getContext("webgl"))); } catch (e) { return false; } })();
+let three = null;
+if (!ok3d) $("err").style.display = "flex"; else three = build3D();
+
+function build3D() {
+  const T = THREE;
+  const theater = $("theater");
+  const renderer = new T.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio || 1));
+  renderer.outputEncoding = T.sRGBEncoding;
+  renderer.toneMapping = T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.88;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = T.PCFSoftShadowMap;
+  renderer.setClearColor(0x000000, 0);
+  theater.insertBefore(renderer.domElement, theater.firstChild);
+
+  const scene = new T.Scene();
+  const camera = new T.PerspectiveCamera(32, 16/9, 0.1, 200);
+  const C = h => new T.Color(h).convertSRGBToLinear();
+
+  (() => {
+    const env = new T.Scene();
+    const g = new T.SphereGeometry(50, 32, 16);
+    const cols = [], pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const y = pos.getY(i) / 50;
+      const c = new T.Color().lerpColors(C("#8A7A6A"), C("#FFF6E8"), (y + 1) / 2);
+      cols.push(c.r, c.g, c.b);
+    }
+    g.setAttribute("color", new T.Float32BufferAttribute(cols, 3));
+    env.add(new T.Mesh(g, new T.MeshBasicMaterial({vertexColors:true, side:T.BackSide})));
+    const panel = (x, y, z, s) => { const m = new T.Mesh(new T.PlaneGeometry(s, s), new T.MeshBasicMaterial({color:0xffffff})); m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m); };
+    panel(20, 30, 20, 24); panel(-30, 15, 10, 16); panel(0, 10, -35, 18);
+    scene.environment = new T.PMREMGenerator(renderer).fromScene(env, 0.04).texture;
+  })();
+
+  scene.add(new T.HemisphereLight(C("#FFF4E6"), C("#8FA895"), 0.4));
+  const key = new T.DirectionalLight(C("#FFF1DE"), 1.35);
+  key.position.set(4, 9, 6);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.radius = 6;
+  key.shadow.bias = -0.0004;
+  Object.assign(key.shadow.camera, {left:-8, right:8, top:8, bottom:-8, near:1, far:30});
+  scene.add(key);
+  const rim = new T.DirectionalLight(C("#CFE8FF"), 0.6);
+  rim.position.set(-6, 5, -6);
+  scene.add(rim);
+
+  /* ---------- helpers ---------- */
+  const kidMats = [];
+  function mat(hex, o = {}) {
+    const m = new T.MeshStandardMaterial({color:C(hex), roughness:o.rough ?? 0.62, metalness:0, envMapIntensity:0.45});
+    if (o.emissive) { m.emissive = C(o.emissive); m.emissiveIntensity = o.ei ?? 0.4; }
+    if (o.kid) kidMats.push({m, base:m.color.clone(), rough:m.roughness, dark:!!o.dark, ei:m.emissiveIntensity});
+    return m;
+  }
+  function mesh(geo, m, parent, shadow = true) {
+    const x = new T.Mesh(geo, m);
+    x.castShadow = shadow; x.receiveShadow = true;
+    if (parent) parent.add(x);
+    return x;
+  }
+  const sph = (r, ws = 40, hs = 28) => new T.SphereGeometry(r, ws, hs);
+  function limb(a, b, r, m, parent) {
+    const d = new T.Vector3().subVectors(b, a), len = d.length();
+    const x = mesh(new T.CylinderGeometry(r, r, len, 24), m, parent);
+    x.position.copy(a).addScaledVector(d, 0.5);
+    x.quaternion.setFromUnitVectors(new T.Vector3(0, 1, 0), d.normalize());
+    mesh(sph(r, 20, 14), m, parent).position.copy(a);
+    return x;
+  }
+  function starGeo(R = 0.2, r = 0.09, depth = 0.07) {
+    const s = new T.Shape();
+    for (let i = 0; i < 10; i++) {
+      const ang = Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r : R;
+      const x = Math.cos(ang) * rr, y = Math.sin(ang) * rr;
+      i ? s.lineTo(x, y) : s.moveTo(x, y);
+    }
+    const g = new T.ExtrudeGeometry(s, {depth, bevelEnabled:true, bevelThickness:0.035, bevelSize:0.035, bevelSegments:4});
+    g.center();
+    return g;
+  }
+  function textTex(txt, w, h, font, fg, bg) {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const x = c.getContext("2d");
+    if (bg) { x.fillStyle = bg; x.fillRect(0, 0, w, h); }
+    x.fillStyle = fg; x.font = font; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText(txt, w / 2, h / 2 + h * 0.04);
+    const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 4;
+    return t;
+  }
+  const whiteMat = new T.MeshStandardMaterial({color:C("#FBFBF8"), roughness:0.3, envMapIntensity:0.45});
+
+  /* ---------- frog (with blinking eyes) ---------- */
+  const allFrogEyes = [];
+  function makeFrog(hex, kid, belly) {
+    const g = new T.Group();
+    const skin = mat(hex, {kid, rough:0.7});
+    const bel = mat(belly, {kid, rough:0.7});
+    const dark = mat("#1D2622", {kid, dark:true, rough:0.3});
+    const pink = mat("#F29A9E", {kid, rough:0.8});
+    const body = mesh(sph(1), skin, g); body.scale.set(0.46, 0.38, 0.4);
+    const bl = mesh(sph(1), bel, g); bl.scale.set(0.3, 0.22, 0.12); bl.position.set(0, -0.08, 0.31);
+    const eyes = [];
+    [-1, 1].forEach(s => {
+      mesh(sph(0.16), skin, g).position.set(0.2 * s, 0.3, 0.08);
+      const eg = new T.Group(); eg.position.set(0.2 * s, 0.33, 0.17); g.add(eg);
+      mesh(sph(0.11), whiteMat, eg);
+      mesh(sph(0.065), dark, eg).position.set(0, 0.005, 0.085);
+      mesh(sph(0.02), whiteMat, eg, false).position.set(0.02, 0.03, 0.14);
+      eyes.push(eg);
+      const ck = mesh(sph(1), pink, g, false); ck.scale.set(0.07, 0.045, 0.03); ck.position.set(0.3 * s, 0.02, 0.3);
+      const ft = mesh(sph(1), skin, g); ft.scale.set(0.16, 0.08, 0.18); ft.position.set(0.3 * s, -0.33, 0.12);
+    });
+    const smile = mesh(new T.TorusGeometry(0.12, 0.018, 10, 30, Math.PI), dark, g, false);
+    smile.rotation.z = Math.PI; smile.position.set(0, 0.12, 0.395);
+    allFrogEyes.push({eyes, next:1 + Math.random() * 4, t:0});
+    return g;
+  }
+
+  /* ---------- the kid ---------- */
+  const kidRoot = new T.Group(); scene.add(kidRoot);
+  const kid = new T.Group(); kidRoot.add(kid);
+  const M = {
+    skin: mat("#F7CDB2", {kid:true, rough:0.72}),
+    hair: mat("#6E4430", {kid:true, rough:0.85}),
+    shirt: mat("#FAF8F4", {kid:true, rough:0.8}),
+    ov: mat("#B22A36", {kid:true, rough:0.78}),
+    shoe: mat("#7A1C27", {kid:true, rough:0.55}),
+    btn: mat("#E9B84A", {kid:true, rough:0.3}),
+    line: mat("#3E251C", {kid:true, dark:true, rough:0.4}),
+    mouth: mat("#6A2323", {kid:true, dark:true, rough:0.5}),
+    tongue: mat("#E8797B", {kid:true, rough:0.6}),
+    cheek: mat("#F2A0A0", {kid:true, rough:0.9}),
+    nose: mat("#F4B99C", {kid:true, rough:0.6}),
+    star: mat("#F6C94A", {kid:true, rough:0.25, emissive:"#FFC93A", ei:0.55})
+  };
+  [-1, 1].forEach(s => {
+    mesh(new T.CylinderGeometry(0.11, 0.1, 0.34, 24), M.skin, kid).position.set(0.19 * s, 0.34, 0);
+    const shoe = mesh(sph(1), M.shoe, kid); shoe.scale.set(0.2, 0.14, 0.27); shoe.position.set(0.2 * s, 0.13, 0.06);
+    mesh(new T.CylinderGeometry(0.2, 0.19, 0.3, 28), M.ov, kid).position.set(0.19 * s, 0.58, 0);
+  });
+  const belly = mesh(sph(1), M.ov, kid); belly.scale.set(0.5, 0.52, 0.44); belly.position.y = 0.98;
+  const shirt = mesh(sph(1), M.shirt, kid); shirt.scale.set(0.46, 0.3, 0.38); shirt.position.y = 1.36;
+  const pocket = mesh(new T.BoxGeometry(0.34, 0.22, 0.04), M.ov, kid); pocket.position.set(0, 1.0, 0.43); pocket.rotation.x = -0.12;
+  [-1, 1].forEach(s => {
+    const st = mesh(new T.BoxGeometry(0.1, 0.34, 0.05), M.ov, kid); st.position.set(0.17 * s, 1.36, 0.33); st.rotation.x = -0.35;
+    mesh(sph(0.04), M.btn, kid).position.set(0.17 * s, 1.24, 0.4);
+  });
+
+  /* arms on shoulder pivots so they can wave, cheer, and hug */
+  const arms = [], frogs = [];
+  [-1, 1].forEach((s, i) => {
+    const pivot = new T.Group(); pivot.position.set(0.43 * s, 1.4, 0); kid.add(pivot);
+    mesh(sph(0.19), M.shirt, pivot);
+    limb(new T.Vector3(0.05 * s, 0, 0), new T.Vector3(0.65 * s, 0.18, 0.12), 0.095, M.skin, pivot);
+    const h = mesh(sph(1), M.skin, pivot); h.scale.set(0.16, 0.08, 0.15); h.position.set(0.69 * s, 0.2, 0.12);
+    const frog = makeFrog(i ? "#3F948F" : "#56AE5E", true, i ? "#9CCFCB" : "#A9DCA4");
+    const holder = new T.Group(); holder.position.set(0.69 * s, 0.5, 0.12); pivot.add(holder);
+    holder.add(frog); frog.scale.setScalar(0.72); frog.rotation.y = -0.25 * s;
+    arms.push({pivot, s, holder}); frogs.push(frog);
+  });
+
+  /* head and face rig */
+  const head = new T.Group(); head.position.y = 2.22; kid.add(head);
+  const HR = 0.78;
+  mesh(sph(HR, 56, 40), M.skin, head);
+  [-1, 1].forEach(s => { const e = mesh(sph(0.17), M.skin, head); e.position.set(0.75 * s, -0.04, 0); e.scale.z = 0.8; });
+  const hair = mesh(new T.SphereGeometry(0.815, 56, 40, 0, Math.PI * 2, 0, 1.32), M.hair, head);
+  hair.rotation.x = -0.38;
+  for (let i = -2; i <= 2; i++) {
+    const a = i * 0.33, bang = mesh(sph(1), M.hair, head);
+    bang.scale.set(0.26, 0.15, 0.12);
+    bang.position.set(Math.sin(a) * 0.72, 0.46 - Math.abs(i) * 0.035, Math.cos(a) * 0.58);
+  }
+  const bunStar = new T.Group(); head.add(bunStar);
+  mesh(sph(0.29), M.hair, bunStar).position.set(0, 0.86, -0.12);
+  const star = mesh(starGeo(0.22, 0.1, 0.06), M.star, bunStar); star.position.set(0, 1.32, -0.1);
+
+  const onHead = (dx, dy, off = 0) => {
+    const z = Math.sqrt(Math.max(0.0001, HR * HR - dx * dx - dy * dy));
+    const n = new T.Vector3(dx, dy, z).normalize();
+    return {p:n.clone().multiplyScalar(HR + off), n};
+  };
+  function place(o, dx, dy, off) { const {p, n} = onHead(dx, dy, off); o.position.copy(p); o.lookAt(p.clone().add(n)); head.add(o); return o; }
+
+  const face = {closed:[], open:[], pupils:[], brows:[]};
+  [-1, 1].forEach(s => {
+    // closed happy eyes
+    const arc = new T.Mesh(new T.TorusGeometry(0.085, 0.022, 12, 30, Math.PI), M.line);
+    face.closed.push(place(arc, 0.27 * s, 0.03, 0.005));
+    // open eyes
+    const eg = place(new T.Group(), 0.27 * s, 0.04, 0);
+    const lid = new T.Group(); eg.add(lid);
+    const wh = mesh(sph(1, 32, 24), whiteMat, lid, false); wh.scale.set(0.12, 0.14, 0.06);
+    const pu = new T.Group(); lid.add(pu);
+    const pm = mesh(sph(1, 24, 16), M.line, pu, false); pm.scale.set(0.07, 0.082, 0.03); pm.position.z = 0.045;
+    mesh(sph(0.022, 12, 8), whiteMat, pu, false).position.set(0.024, 0.035, 0.075);
+    face.open.push(lid); face.pupils.push(pu);
+    // brows
+    const bg = place(new T.Group(), 0.27 * s, 0.22, 0.012);
+    const inner = new T.Group(); bg.add(inner);
+    const br = mesh(new T.CylinderGeometry(0.024, 0.024, 0.17, 12), M.hair, inner, false); br.rotation.z = Math.PI / 2;
+    mesh(sph(0.024, 12, 8), M.hair, inner, false).position.x = 0.085;
+    mesh(sph(0.024, 12, 8), M.hair, inner, false).position.x = -0.085;
+    face.brows.push({inner, s});
+    const ck = new T.Mesh(sph(1, 24, 16), M.cheek); ck.scale.set(0.13, 0.08, 0.03);
+    place(ck, 0.4 * s, -0.17, -0.005);
+  });
+  const smileArc = new T.Mesh(new T.TorusGeometry(0.13, 0.022, 12, 30, Math.PI), M.line);
+  place(smileArc, 0, -0.24, 0.005); smileArc.rotateZ(Math.PI);
+  const openMouth = place(new T.Group(), 0, -0.27, -0.01);
+  const om = mesh(sph(1, 32, 20), M.mouth, openMouth, false); om.scale.set(0.15, 0.11, 0.05);
+  const tg = mesh(sph(1, 24, 16), M.tongue, openMouth, false); tg.scale.set(0.09, 0.05, 0.03); tg.position.set(0, -0.045, 0.025);
+  const upperLip = mesh(new T.CylinderGeometry(0.155, 0.155, 0.03, 32, 1, false, 0, Math.PI), M.skin, openMouth, false);
+  upperLip.rotation.set(Math.PI / 2, 0, Math.PI / 2); upperLip.position.set(0, 0.035, 0.03); upperLip.scale.set(1, 1, 0.25);
+  upperLip.visible = false;
+  const oMouth = new T.Mesh(new T.TorusGeometry(0.055, 0.022, 12, 30), M.line);
+  place(oMouth, 0, -0.27, 0.005);
+  const oFill = new T.Mesh(new T.CircleGeometry(0.05, 24), M.mouth); oMouth.add(oFill); oFill.position.z = -0.005;
+  const frown = new T.Mesh(new T.TorusGeometry(0.1, 0.02, 12, 30, Math.PI), M.line);
+  place(frown, 0, -0.31, 0.005);
+  const nose = new T.Mesh(sph(0.065, 24, 16), M.nose); place(nose, 0, -0.08, 0.02);
+  const noseShine = new T.Mesh(sph(0.03, 12, 8), new T.MeshBasicMaterial({color:0xFFF6D0})); place(noseShine, 0.03, -0.05, 0.075);
+
+  const FACES = {
+    happy:    {closed:1, open:0, smile:1, openM:0, oM:0, frown:0, up:0,   sad:0,   eye:1},
+    open:     {closed:0, open:1, smile:1, openM:0, oM:0, frown:0, up:0,   sad:0,   eye:1},
+    giggle:   {closed:1, open:0, smile:0, openM:1, oM:0, frown:0, up:0.4, sad:0,   eye:1},
+    surprised:{closed:0, open:1, smile:0, openM:0, oM:1, frown:0, up:1,   sad:0,   eye:1.25},
+    sad:      {closed:0, open:1, smile:0, openM:0, oM:0, frown:1, up:0,   sad:1,   eye:0.9},
+    worried:  {closed:0, open:1, smile:0, openM:0, oM:0, frown:0.7, up:0.3, sad:0.7, eye:1},
+    proud:    {closed:1, open:0, smile:0, openM:0.55, oM:0, frown:0, up:0.7, sad:0, eye:1}
+  };
+  const W = Object.assign({}, FACES.happy);
+  let faceT = FACES.happy;
+  let blinkNext = 2, blinkT = -1, lookX = 0, lookY = 0, lookXT = 0, lookYT = 0;
+
+  /* accessories */
+  const acc = {};
+  acc.hat = new T.Group(); head.add(acc.hat);
+  mesh(new T.SphereGeometry(0.84, 48, 32, 0, Math.PI * 2, 0, 1.25), mat("#3E6FAE", {rough:0.95}), acc.hat).rotation.x = -0.25;
+  const band = mesh(new T.TorusGeometry(0.72, 0.1, 16, 48), mat("#F2F2F0", {rough:0.95}), acc.hat); band.rotation.x = Math.PI / 2 - 0.25; band.position.set(0, 0.34, -0.08);
+  mesh(sph(0.2), mat("#F2F2F0", {rough:1}), acc.hat).position.set(0, 0.95, -0.2);
+  acc.scarf = new T.Group(); kid.add(acc.scarf);
+  const sc = mat("#D8483A", {rough:0.95});
+  const ring = mesh(new T.TorusGeometry(0.32, 0.11, 16, 40), sc, acc.scarf); ring.rotation.x = Math.PI / 2; ring.position.y = 1.55;
+  const tail = mesh(new T.BoxGeometry(0.2, 0.5, 0.08), sc, acc.scarf); tail.position.set(0.18, 1.3, 0.42); tail.rotation.set(-0.3, 0, 0.12);
+  acc.helmet = new T.Group(); head.add(acc.helmet);
+  mesh(new T.SphereGeometry(0.86, 48, 32, 0, Math.PI * 2, 0, 1.45), mat("#B8182E", {rough:0.25}), acc.helmet).rotation.x = -0.3;
+  const stripe = mesh(new T.TorusGeometry(0.87, 0.06, 10, 60, Math.PI * 0.95), mat("#FFFFFF", {rough:0.3}), acc.helmet);
+  stripe.rotation.y = Math.PI / 2; stripe.rotation.z = 0.1;
+  acc.jersey = new T.Group(); kid.add(acc.jersey);
+  const jw = mat("#FFFFFF", {rough:0.8}), jr = mat("#B8182E", {rough:0.8});
+  const jb = mesh(sph(1), jw, acc.jersey); jb.scale.set(0.52, 0.42, 0.46); jb.position.y = 1.3;
+  arms.forEach(a => { const sl = mesh(sph(0.215), jr, null); acc.jersey.userData[a.s] = sl; a.pivot.add(sl); sl.visible = false; });
+  const num = new T.Mesh(new T.PlaneGeometry(0.34, 0.34), new T.MeshStandardMaterial({map:textTex("1", 256, 256, "800 220px 'Baloo 2', sans-serif", "#B8182E"), transparent:true, roughness:0.8}));
+  num.position.set(0, 1.25, 0.465); acc.jersey.add(num);
+  Object.values(acc).forEach(a => a.visible = false);
+
+  /* effects attached to the kid */
+  const sparkMat = new T.MeshStandardMaterial({color:C("#FFE27A"), emissive:C("#FFD23A"), emissiveIntensity:0.9, roughness:0.3});
+  const sparkGeo = starGeo(0.12, 0.045, 0.03);
+  function sparkleSet(points) {
+    const g = new T.Group();
+    points.forEach((p, i) => { const s = mesh(sparkGeo, sparkMat, g, false); s.position.set(...p); s.userData.ph = i * 1.3; });
+    kidRoot.add(g); return g;
+  }
+  const sets = {};
+  sets.sparkle = sparkleSet([[0.95, 3.0, 0.6], [-1.0, 3.1, 0.5], [1.35, 2.3, 0.5], [-1.35, 2.2, 0.5]]);
+  sets.shine = sparkleSet([[-1.4, 3.0, 0.3], [1.5, 3.2, 0.2], [-1.2, 0.9, 0.6], [1.3, 1.0, 0.6], [0, 3.9, 0]]);
+  sets.hands = new T.Group(); kidRoot.add(sets.hands);
+  (() => {
+    const sk = mat("#E2A983", {rough:0.7});
+    const g = new T.Group(); sets.hands.add(g);
+    limb(new T.Vector3(-1.3, 1.1, 1.8), new T.Vector3(-0.2, 2.1, 1.0), 0.12, sk, g);
+    const h = mesh(sph(1), sk, g); h.scale.set(0.16, 0.12, 0.14); h.position.set(-0.12, 2.12, 0.93);
+    sets.hands.userData.arm = g;
+  })();
+
+  /* ---------- environments ---------- */
+  function ground(hex, r = 40) { const m = mesh(new T.CircleGeometry(r, 64), mat(hex, {rough:0.95}), null, false); m.rotation.x = -Math.PI / 2; return m; }
+  function wall(hex) { const m = mesh(new T.PlaneGeometry(40, 16), mat(hex, {rough:0.95}), null, false); m.position.set(0, 8, -4.5); return m; }
+
+  sets.lily = new T.Group(); scene.add(sets.lily);
+  const water = mesh(new T.CircleGeometry(9, 64), new T.MeshStandardMaterial({color:C("#6FB8CF"), roughness:0.25, metalness:0.1, envMapIntensity:1}), sets.lily, false);
+  water.rotation.x = -Math.PI / 2; water.position.y = -0.14;
+  const pad = mesh(new T.CylinderGeometry(1.75, 1.8, 0.12, 64, 1, false, 0.3, Math.PI * 2 - 0.6), mat("#5DA04C", {rough:0.7}), sets.lily);
+  pad.position.y = -0.06; pad.rotation.y = Math.PI;
+  mesh(new T.CylinderGeometry(0.9, 0.9, 0.08, 48, 1, false, 0.4, Math.PI * 2 - 0.8), mat("#6DB05A", {rough:0.7}), sets.lily).position.set(-2.6, -0.09, 1.2);
+  mesh(new T.CylinderGeometry(0.7, 0.7, 0.08, 48, 1, false, 1, Math.PI * 2 - 0.7), mat("#4E9443", {rough:0.7}), sets.lily).position.set(2.8, -0.09, -1.4);
+
+  sets.studio = new T.Group(); scene.add(sets.studio);
+  sets.studio.add(ground("#C9A27E"), wall("#EDDCC6"));
+  (() => {
+    const g = sets.studio, wood = mat("#8B6A4E", {rough:0.7});
+    mesh(new T.BoxGeometry(2.8, 2.4, 0.2), wood, g).position.set(3.6, 3.6, -4.4);
+    mesh(new T.PlaneGeometry(2.4, 2.0), new T.MeshBasicMaterial({color:C("#DDF1FA")}), g, false).position.set(3.6, 3.6, -4.28);
+    mesh(new T.BoxGeometry(0.1, 2.0, 0.1), wood, g).position.set(3.6, 3.6, -4.22);
+    mesh(new T.BoxGeometry(2.4, 0.1, 0.1), wood, g).position.set(3.6, 3.6, -4.22);
+    mesh(new T.BoxGeometry(3, 0.12, 0.8), wood, g).position.set(-3.8, 2.0, -4.0);
+    const clay = mat("#B08A5E", {rough:0.8});
+    const a = mesh(sph(0.3), clay, g); a.position.set(-4.7, 2.36, -4); a.scale.y = 0.85;
+    mesh(sph(0.2), clay, g).position.set(-4.7, 2.75, -4);
+    mesh(new T.BoxGeometry(0.4, 0.4, 0.4), clay, g).position.set(-3.7, 2.26, -4);
+    const d = makeFrog("#A98252", false, "#C4A27A"); d.scale.setScalar(0.5); d.position.set(-2.9, 2.28, -3.9); g.add(d);
+    mesh(new T.CylinderGeometry(0.9, 1.0, 0.3, 40), wood, g).position.y = 0.15;
+  })();
+
+  sets.museum = new T.Group(); scene.add(sets.museum);
+  sets.museum.add(ground("#A89684"), wall("#DCD6E6"));
+  (() => {
+    const g = sets.museum, gold = new T.MeshStandardMaterial({color:C("#C99A3E"), metalness:0.8, roughness:0.35});
+    mesh(new T.BoxGeometry(2.0, 0.6, 1.6), mat("#F4F1F7", {rough:0.5}), g).position.y = 0.3;
+    mesh(new T.BoxGeometry(2.4, 1.8, 0.12), gold, g).position.set(-4.4, 3.6, -4.4);
+    mesh(new T.PlaneGeometry(2.0, 1.4), mat("#8FBD9C", {rough:0.9}), g, false).position.set(-4.4, 3.6, -4.33);
+    mesh(new T.BoxGeometry(2.0, 2.6, 0.12), gold, g).position.set(4.4, 3.6, -4.4);
+    mesh(new T.PlaneGeometry(1.6, 2.2), mat("#EBC9A6", {rough:0.9}), g, false).position.set(4.4, 3.6, -4.33);
+    mesh(new T.CircleGeometry(0.45, 32), mat("#D98C6A", {rough:0.9}), g, false).position.set(4.4, 3.8, -4.32);
+    const red = mat("#B42A3A", {rough:0.6});
+    [[-4.6, -2.2], [2.2, 4.6]].forEach(([a, b]) => {
+      [a, b].forEach(x => { mesh(new T.CylinderGeometry(0.07, 0.1, 1.1, 20), gold, g).position.set(x, 0.55, 1.6); mesh(sph(0.1), gold, g).position.set(x, 1.12, 1.6); });
+      const curve = new T.QuadraticBezierCurve3(new T.Vector3(a, 1.0, 1.6), new T.Vector3((a + b) / 2, 0.55, 1.6), new T.Vector3(b, 1.0, 1.6));
+      mesh(new T.TubeGeometry(curve, 30, 0.045, 10), red, g);
+    });
+  })();
+
+  sets.campus = new T.Group(); scene.add(sets.campus);
+  sets.campus.add(ground("#8CC07A", 60));
+  (() => {
+    const g = sets.campus, brick = mat("#B3604A", {rough:0.9}), cream = mat("#F3E7C9", {rough:0.6});
+    mesh(new T.BoxGeometry(8, 4.6, 3), brick, g).position.set(6.5, 2.3, -9);
+    mesh(new T.BoxGeometry(8.5, 0.35, 3.4), mat("#8E4636", {rough:0.8}), g).position.set(6.5, 4.75, -9);
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 6; c++) {
+      if (r === 1 && (c === 2 || c === 3)) continue;
+      mesh(new T.BoxGeometry(0.8, 1.0, 0.1), cream, g).position.set(3.5 + c * 1.2, 3.5 - r * 1.5, -7.45);
+    }
+    mesh(new T.BoxGeometry(1.2, 2.0, 0.1), mat("#6B3226", {rough:0.7}), g).position.set(6.5, 1.0, -7.45);
+    const sign = mesh(new T.PlaneGeometry(3.4, 0.6), new T.MeshStandardMaterial({map:textTex("Bracken Library", 1024, 180, "800 110px 'Baloo 2', sans-serif", "#6B4632", "#FFF8EC"), roughness:0.8}), g, false);
+    sign.position.set(6.5, 2.35, -7.38);
+    const leaf = mat("#79B368", {rough:0.9}), trunk = mat("#8A6446", {rough:0.9});
+    [[-6.5, -6], [-4.3, -9.5], [-9, -9], [12, -6]].forEach(([x, z], i) => {
+      mesh(new T.CylinderGeometry(0.18, 0.24, 1.6, 16), trunk, g).position.set(x, 0.8, z);
+      mesh(sph(1.2 + (i % 2) * 0.3), leaf, g).position.set(x, 2.3, z);
+      mesh(sph(0.8), leaf, g).position.set(x + 0.7, 2.0, z + 0.3);
+    });
+  })();
+
+  sets.fountain = new T.Group(); scene.add(sets.fountain);
+  const fountainFrogs = [], drops = [];
+  (() => {
+    const g = sets.fountain, stone = mat("#D6CCBD", {rough:0.85});
+    mesh(new T.CylinderGeometry(3.6, 3.7, 0.3, 72), stone, g).position.y = 0.15;
+    mesh(new T.CylinderGeometry(3.25, 3.25, 0.04, 72), new T.MeshStandardMaterial({color:C("#4FA6C2"), roughness:0.3, metalness:0, envMapIntensity:0.5}), g, false).position.y = 0.33;
+    const lip = mesh(new T.TorusGeometry(3.42, 0.2, 20, 90), stone, g); lip.rotation.x = Math.PI / 2; lip.position.y = 0.34;
+    mesh(new T.CylinderGeometry(0.85, 1.0, 0.8, 48), mat("#C7BCAC", {rough:0.85}), g).position.y = 0.4;
+    const bronze = new T.MeshStandardMaterial({color:C("#9C6B35"), metalness:0.75, roughness:0.4});
+    [0.55, 2.2, 3.9, 5.6].forEach(a => {
+      const f = makeFrog("#9C6B35", false, "#B98A4E");
+      f.traverse(o => { if (o.isMesh && o.material !== whiteMat && o.material.color) o.material = bronze; });
+      f.scale.setScalar(0.5);
+      f.position.set(Math.cos(a) * 3.42, 0.72, Math.sin(a) * 3.42);
+      f.lookAt(0, 0.72, 0);
+      g.add(f); fountainFrogs.push(f);
+      const from = new T.Vector3(Math.cos(a) * 3.2, 0.8, Math.sin(a) * 3.2);
+      const to = new T.Vector3(Math.cos(a) * 1.05, 0.35, Math.sin(a) * 1.05);
+      const mid = from.clone().lerp(to, 0.5); mid.y = 2.0;
+      const curve = new T.QuadraticBezierCurve3(from, mid, to);
+      const dm = new T.MeshStandardMaterial({color:C("#D8F1F8"), roughness:0.1, transparent:true, opacity:0.85});
+      for (let k = 0; k < 16; k++) { const d = mesh(sph(0.045, 10, 8), dm, g, false); d.userData = {curve, t:k / 16}; drops.push(d); }
+    });
+  })();
+
+  sets.snow = new T.Group(); scene.add(sets.snow);
+  const snowGeo = new T.BufferGeometry(), SN = 700, sp = new Float32Array(SN * 3);
+  for (let i = 0; i < SN; i++) { sp[i * 3] = (Math.random() - 0.5) * 22; sp[i * 3 + 1] = Math.random() * 9; sp[i * 3 + 2] = (Math.random() - 0.5) * 14 - 1; }
+  snowGeo.setAttribute("position", new T.BufferAttribute(sp, 3));
+  const snowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"); const gr = x.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(1, "rgba(255,255,255,0)"); x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return new T.CanvasTexture(c); })();
+  sets.snow.add(new T.Points(snowGeo, new T.PointsMaterial({size:0.24, map:snowTex, transparent:true, depthWrite:false})));
+
+  sets.game = new T.Group(); scene.add(sets.game);
+  const pennants = [];
+  (() => {
+    const g = sets.game;
+    const curve = new T.QuadraticBezierCurve3(new T.Vector3(-7, 5.4, -3), new T.Vector3(0, 4.4, -3), new T.Vector3(7, 5.4, -3));
+    mesh(new T.TubeGeometry(curve, 40, 0.025, 8), mat("#6B4632"), g, false);
+    const tri = new T.Shape(); tri.moveTo(-0.35, 0); tri.lineTo(0.35, 0); tri.lineTo(0, -0.8); tri.lineTo(-0.35, 0);
+    const tgeo = new T.ExtrudeGeometry(tri, {depth:0.02, bevelEnabled:false});
+    for (let i = 1; i < 12; i++) {
+      const p = curve.getPoint(i / 12), pg = new T.Group(); pg.position.copy(p);
+      mesh(tgeo, mat(i % 2 ? "#B8182E" : "#FFFFFF", {rough:0.8}), pg);
+      pg.userData.ph = i; g.add(pg); pennants.push(pg);
+    }
+  })();
+
+  sets.spray = new T.Group(); scene.add(sets.spray);
+  const mist = [];
+  (() => {
+    const g = sets.spray; g.position.set(2.3, 0.9, 1.2);
+    mesh(new T.CylinderGeometry(0.22, 0.22, 0.9, 32), new T.MeshStandardMaterial({color:C("#B8B8C4"), metalness:0.9, roughness:0.25}), g);
+    mesh(new T.CylinderGeometry(0.225, 0.225, 0.35, 32), new T.MeshStandardMaterial({color:C("#E2B92F"), metalness:0.6, roughness:0.3}), g);
+    mesh(new T.CylinderGeometry(0.1, 0.12, 0.16, 24), mat("#555563"), g).position.y = 0.53;
+    g.rotation.z = 0.35;
+    const mm = new T.MeshStandardMaterial({color:C("#F0C93F"), metalness:0.5, roughness:0.4, transparent:true, opacity:0.9});
+    for (let i = 0; i < 18; i++) { const m = mesh(sph(0.05, 10, 8), mm, scene, false); m.userData.t = i / 18; mist.push(m); }
+  })();
+
+  sets.caps = new T.Group(); scene.add(sets.caps);
+  const caps = [];
+  (() => {
+    const dk = mat("#2E2A3A", {rough:0.6}), tas = mat("#F4C542", {rough:0.4});
+    [[-2.6, 2.4, 0.5], [2.8, 2.8, 0.2], [-1.7, 3.8, -1], [2.0, 4.2, -1.2], [0.2, 4.6, -1.6]].forEach((p, i) => {
+      const c = new T.Group();
+      mesh(new T.BoxGeometry(0.7, 0.05, 0.7), dk, c);
+      mesh(new T.CylinderGeometry(0.24, 0.26, 0.2, 24), dk, c).position.y = -0.12;
+      mesh(new T.CylinderGeometry(0.015, 0.015, 0.3, 8), tas, c).position.set(0.3, -0.12, 0.3);
+      c.position.set(...p); c.userData = {base:p[1], ph:i * 1.2};
+      sets.caps.add(c); caps.push(c);
+    });
+  })();
+
+  sets.burst = new T.Group(); scene.add(sets.burst);
+  (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 256; const x = c.getContext("2d");
+    const gr = x.createRadialGradient(128, 128, 0, 128, 128, 128); gr.addColorStop(0, "rgba(255,244,190,.95)"); gr.addColorStop(1, "rgba(255,244,190,0)");
+    x.fillStyle = gr; x.fillRect(0, 0, 256, 256);
+    const s = new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(c), depthWrite:false, transparent:true}));
+    s.scale.set(7, 7, 1); s.position.set(0, 2.0, -1.2); sets.burst.add(s);
+  })();
+
+  /* ---------- scene state ---------- */
+  const kidY = {studio:0.3, museum:0.6, fountain:0.8};
+  const CAMS = {
+    title:{p:[-1.9, 2.3, 8.0], t:[-1.75, 1.8, 0]},
+    mid:{p:[1.3, 2.5, 8.8], t:[0, 1.85, 0]},
+    midR:{p:[-1.2, 2.4, 8.6], t:[0.4, 1.8, 0]},
+    close:{p:[1.0, 3.0, 6.0], t:[0, 2.35, 0]},
+    wide:{p:[0, 4.2, 12.5], t:[0, 1.5, 0]},
+    frogs:{p:[5.2, 3.8, 10.2], t:[0, 1.4, 0]}
+  };
+  const camPos = new T.Vector3(), camTgt = new T.Vector3(), camPosT = new T.Vector3(), camTgtT = new T.Vector3();
+  let mode = "color", noseT = 1, shinyNose = false;
+  let beats = STAGE[0].beats, beatIdx = -1, sceneStart = 0, act = "idle", actStart = 0;
+  let tAll = 0;
+
+  function apply(i) {
+    const s = SCENES[i], st = STAGE[i];
+    Object.entries(sets).forEach(([k, g]) => g.visible = s.l.includes(k));
+    mist.forEach(m => m.visible = s.l.includes("spray"));
+    mode = s.mode;
+    noseT = s.nose === "worn" ? 0.35 : 1;
+    shinyNose = s.nose === "shiny";
+    const a = s.acc || [];
+    Object.entries(acc).forEach(([k, g]) => g.visible = a.includes(k));
+    arms.forEach(x => acc.jersey.userData[x.s].visible = a.includes("jersey"));
+    bunStar.visible = !(a.includes("hat") || a.includes("helmet"));
+    let ky = 0;
+    for (const k in kidY) if (s.l.includes(k)) ky = kidY[k];
+    kidRoot.position.y = ky;
+    const c = CAMS[st.cam];
+    camPosT.set(...c.p); camTgtT.set(...c.t);
+    if (st.cam !== "title") camTgtT.y += ky * 0.8;
+    camPos.copy(camPosT).add(new T.Vector3(0.8, 0.25, 0.9));
+    camTgt.copy(camTgtT);
+    theater.style.background = st.bg;
+    beats = st.beats; beatIdx = -1; sceneStart = tAll;
+  }
+
+  /* ---------- acting ---------- */
+  const P = {y:0, sq:1, rx:0, ry:0, rz:0, hx:0, hy:0, hz:0, aL:0, aR:0, sc:1, frogHop:1};
+  const cur = Object.assign({}, P);
+  const bell = u => Math.sin(Math.PI * Math.min(1, Math.max(0, u)));
+  const easeOut = u => 1 - Math.pow(1 - Math.min(1, u), 3);
+  const elastic = u => u >= 1 ? 1 : 1 - Math.pow(2, -9 * u) * Math.cos(u * 11);
+  function pose(name, u, t) {
+    const p = Object.assign({}, P, {y:Math.sin(t * 2) * 0.03, hz:Math.sin(t * 1.1) * 0.05, hx:Math.sin(t * 0.8) * 0.02});
+    switch (name) {
+      case "wave": p.aR = 0.7 + Math.sin(t * 9) * 0.28; p.hz = 0.14; p.rz = -0.04; break;
+      case "hop": { const h = Math.abs(Math.sin(t * 4.2)); p.y = h * 0.28; p.sq = h < 0.15 ? 0.9 : 1.04; p.aL = p.aR = 0.35; p.frogHop = 1.6; break; }
+      case "cheer": { const h = Math.abs(Math.sin(t * 4.8)); p.y = h * 0.4; p.sq = h < 0.15 ? 0.88 : 1.05; p.aL = p.aR = 0.85 + Math.sin(t * 9.6) * 0.12; p.hx = -0.1; p.frogHop = 2; break; }
+      case "shiver": p.rz = Math.sin(t * 46) * 0.035; p.hz = Math.sin(t * 40) * 0.05; p.aL = p.aR = -0.45; p.hx = 0.12; p.sq = 0.96; p.y = 0; p.frogHop = 0.3; break;
+      case "wiggle": p.hz = Math.sin(t * 12) * 0.14; p.rz = Math.sin(t * 12 + 1) * 0.05; p.y = Math.abs(Math.sin(t * 6)) * 0.06; p.hx = -0.05; break;
+      case "droop": p.hx = 0.28; p.aL = p.aR = -0.3; p.y = -0.02; p.rz = Math.sin(t * 1.2) * 0.03; p.sq = 0.97; p.frogHop = 0.2; break;
+      case "spin": { const v = easeOut(u / 1.3); p.ry = v * Math.PI * 2; p.y = bell(u / 1.3) * 0.45; p.aL = p.aR = 0.6 * bell(u / 1.3); break; }
+      case "look": p.hy = Math.sin(t * 1.3) * 0.5; p.hz = Math.sin(t * 1.3) * 0.06; break;
+      case "bow": { const b = bell(u / 1.8); p.rx = 0.38 * b; p.hx = 0.18 * b; p.aL = p.aR = -0.2 * b; break; }
+      case "flinch": {
+        if (u < 0.45) { p.rx = -0.22; p.y = 0.12; p.aL = p.aR = 0.9; p.sq = 1.06; }
+        else { const d = Math.exp(-(u - 0.45) * 2); p.hy = Math.sin(t * 20) * 0.22 * d; p.rz = Math.sin(t * 20) * 0.05 * d; }
+        break;
+      }
+      case "pop": p.sc = elastic(u / 0.9); p.y = 0; break;
+      case "sway": p.rz = Math.sin(t * 2) * 0.08; p.hz = -Math.sin(t * 2) * 0.1; p.y = Math.abs(Math.sin(t * 2)) * 0.04; break;
+      case "nod": p.hx = Math.sin(t * 6) * 0.12; break;
+    }
+    return p;
+  }
+
+  const bronzeC = C("#9E6A32"), bronzeDk = C("#3A2612"), goldC = C("#E8B92E"), goldDk = C("#7A5A10");
+  function resize() {
+    const w = theater.clientWidth, h = theater.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(theater); resize();
+
+  const clock = new T.Clock();
+  function tick() {
+    const dt = Math.min(0.05, clock.getDelta()); tAll += dt;
+    const mv = reduced ? 0 : 1;
+
+    // beats
+    const st = tAll - sceneStart;
+    let bi = 0;
+    for (let k = 0; k < beats.length; k++) if (st >= beats[k][0]) bi = k;
+    if (bi !== beatIdx) {
+      beatIdx = bi;
+      faceT = FACES[beats[bi][1]] || FACES.happy;
+      if (beats[bi][2] !== act || bi === 0) { act = beats[bi][2]; actStart = tAll; }
+    }
+
+    camPos.lerp(camPosT, 1 - Math.pow(0.02, dt * 0.35));
+    camTgt.lerp(camTgtT, 1 - Math.pow(0.02, dt * 0.6));
+    camera.position.copy(camPos); camera.lookAt(camTgt);
+
+    const k = 1 - Math.pow(0.03, dt);
+    kidMats.forEach(o => {
+      let tc = o.base, tm = 0, tr = o.rough, te = o.ei || 0;
+      if (mode === "bronze") { tc = o.dark ? bronzeDk : bronzeC.clone().lerp(o.base, 0.08); tm = 0.78; tr = 0.36; te = 0; }
+      if (mode === "gold") { tc = o.dark ? goldDk : goldC; tm = 0.92; tr = 0.24; te = 0; }
+      o.m.color.lerp(tc, k); o.m.metalness += (tm - o.m.metalness) * k; o.m.roughness += (tr - o.m.roughness) * k;
+      if (o.m.emissive) o.m.emissiveIntensity += (te - o.m.emissiveIntensity) * k;
+    });
+    nose.scale.setScalar(nose.scale.x + (noseT - nose.scale.x) * k);
+    noseShine.visible = shinyNose && Math.sin(tAll * 6) > -0.3;
+
+    // body pose
+    const target = mv ? pose(act, tAll - actStart, tAll) : Object.assign({}, P, {sc:1});
+    const kf = 1 - Math.pow(0.0005, dt);
+    for (const key in cur) cur[key] += (target[key] - cur[key]) * (key === "ry" || key === "sc" ? 1 : kf);
+    kid.position.y = cur.y;
+    kid.scale.set(cur.sc * (2 - cur.sq), cur.sc * cur.sq, cur.sc * (2 - cur.sq));
+    kid.rotation.set(cur.rx, cur.ry, cur.rz);
+    head.rotation.set(cur.hx, cur.hy, cur.hz);
+    arms.forEach((a, i) => {
+      const ang = i ? cur.aR : cur.aL;
+      a.pivot.rotation.z = a.s * ang;
+      a.holder.rotation.z = -a.s * ang;
+    });
+    star.rotation.y = tAll * 1.2 * mv;
+
+    // face
+    const fk = 1 - Math.pow(0.001, dt);
+    for (const key in W) W[key] += (faceT[key] - W[key]) * fk;
+    if (W.open > 0.5) {
+      blinkNext -= dt;
+      if (blinkNext <= 0 && blinkT < 0) { blinkT = 0; blinkNext = 2.2 + Math.random() * 3; }
+    }
+    let blink = 1;
+    if (blinkT >= 0) { blinkT += dt; blink = Math.abs(1 - blinkT / 0.07); if (blinkT > 0.14) { blinkT = -1; blink = 1; } blink = Math.max(0.08, Math.min(1, blink)); }
+    face.closed.forEach(m => { m.scale.setScalar(Math.max(0.001, W.closed)); m.visible = W.closed > 0.02; });
+    face.open.forEach(m => { const e = W.open * W.eye; m.scale.set(Math.max(0.001, e), Math.max(0.001, e * blink), Math.max(0.001, e)); m.parent.visible = W.open > 0.02; });
+    if (act === "look") { lookXT = Math.sin(tAll * 1.3) * 0.6; lookYT = 0; }
+    else if (faceT === FACES.sad) { lookXT = 0; lookYT = -0.6; }
+    else { lookXT = 0; lookYT = 0.1; }
+    lookX += (lookXT - lookX) * fk; lookY += (lookYT - lookY) * fk;
+    face.pupils.forEach(p => p.position.set(lookX * 0.035, lookY * 0.035, 0));
+    const browVis = Math.max(W.up, W.sad);
+    face.brows.forEach(b => {
+      b.inner.parent.visible = browVis > 0.03;
+      b.inner.scale.setScalar(Math.max(0.001, browVis));
+      b.inner.position.y = W.up * 0.07;
+      b.inner.rotation.z = -b.s * W.sad * 0.4;
+    });
+    smileArc.scale.setScalar(Math.max(0.001, W.smile)); smileArc.visible = W.smile > 0.02;
+    openMouth.scale.setScalar(Math.max(0.001, W.openM)); openMouth.visible = W.openM > 0.02;
+    oMouth.scale.setScalar(Math.max(0.001, W.oM)); oMouth.visible = W.oM > 0.02;
+    frown.scale.setScalar(Math.max(0.001, W.frown * 0.9)); frown.visible = W.frown > 0.02;
+
+    // frogs in hands
+    frogs.forEach((f, i) => {
+      const ph = (tAll * 0.45 * cur.frogHop + i * 0.5) % 1;
+      let y = 0, sq = 1;
+      if (ph > 0.7 && ph < 0.78) sq = 1 - (ph - 0.7) * 1.5;
+      else if (ph >= 0.78 && ph < 0.92) { const u = (ph - 0.78) / 0.14; y = Math.sin(u * Math.PI) * 0.28 * Math.min(1.6, cur.frogHop); sq = 1.06; }
+      f.position.y = y * mv;
+      f.scale.set(0.72 * (2 - sq), 0.72 * sq, 0.72);
+    });
+    allFrogEyes.forEach(fe => {
+      fe.t += dt;
+      let b = 1;
+      if (fe.t > fe.next) { const u = (fe.t - fe.next) / 0.14; b = Math.max(0.1, Math.abs(1 - u * 2)); if (u >= 1) { fe.t = 0; fe.next = 2 + Math.random() * 4; b = 1; } }
+      fe.eyes.forEach(e => e.scale.y = b);
+    });
+
+    fountainFrogs.forEach((f, i) => f.scale.setScalar(0.5 + Math.sin(tAll * 3 + i) * 0.01 * mv));
+    drops.forEach(d => { d.userData.t = (d.userData.t + dt * 0.55 * (mv || 0.001)) % 1; d.position.copy(d.userData.curve.getPoint(d.userData.t)); });
+    [sets.sparkle, sets.shine].forEach(g => g.children.forEach(s => { const v = 0.4 + 0.6 * Math.abs(Math.sin(tAll * 2.2 + s.userData.ph)); s.scale.setScalar(mv ? v : 1); s.rotation.z = tAll * mv; }));
+    const arm = sets.hands.userData.arm; arm.position.x = Math.sin(tAll * 10) * 0.07 * mv; arm.position.y = Math.cos(tAll * 10) * 0.03 * mv;
+    if (sets.snow.visible) {
+      const p = snowGeo.attributes.position;
+      for (let i = 0; i < SN; i++) { let y = p.getY(i) - dt * (0.6 + (i % 7) * 0.08) * (mv || 0); if (y < 0) y = 9; p.setY(i, y); p.setX(i, p.getX(i) + Math.sin(tAll + i) * 0.002 * mv); }
+      p.needsUpdate = true;
+    }
+    pennants.forEach(pg => pg.rotation.z = Math.sin(tAll * 2 + pg.userData.ph) * 0.12 * mv);
+    caps.forEach(c => { const u = (Math.sin(tAll * 1.6 + c.userData.ph) + 1) / 2; c.position.y = c.userData.base + u * 0.9 * mv; c.rotation.x = u * 3 * mv; c.rotation.z = u * 1.5 * mv; });
+    mist.forEach(m => { m.userData.t = (m.userData.t + dt * 0.6) % 1; const t = m.userData.t; m.position.set(2.05 - t * 1.6, 1.4 + t * 0.3 + Math.sin(t * 9 + m.id) * 0.1, 1.2 - t * 0.4); m.scale.setScalar(1 + t * 1.5); });
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+  return {apply};
+}
+
+/* ================= story player ================= */
+SCENES.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.setAttribute("aria-label", "Scene " + (i + 1));
+  b.onclick = () => show(i);
+  $("dots").appendChild(b);
+});
+
+function applyUI() {
+  const t = UI[lang];
+  document.documentElement.lang = lang;
+  $("tagline").textContent = t.tag;
+  $("titleSub").textContent = t.sub;
+  $("startH").textContent = t.start;
+  $("startP").textContent = t.startP;
+  $("bStart").textContent = t.go;
+  $("bPrev").textContent = t.prev;
+  $("bNext").textContent = t.next;
+  $("bPlay").textContent = playing ? t.pause : t.play;
+  $("bVoice").textContent = voice ? t.von : t.voff;
+  $("bVoice").setAttribute("aria-pressed", voice);
+  $("bQuiz").textContent = t.quiz;
+  $("bReplay").textContent = t.replay;
+  $("src").textContent = t.src;
+  $("bEn").setAttribute("aria-pressed", lang === "en");
+  $("bKo").setAttribute("aria-pressed", lang === "ko");
+}
+
+let fadeTimer = null;
+function show(i, instant) {
+  const changed = i !== idx || instant;
+  idx = i;
+  const s = SCENES[i];
+  const swap = () => {
+    if (three) three.apply(i);
+    const b = $("badge");
+    b.textContent = s.badge ? s.badge[lang] : "";
+    b.classList.toggle("on", !!s.badge);
+    $("titlecard").classList.toggle("on", !!s.title);
+    $("endbtns").classList.toggle("on", !!s.end && !playing);
+  };
+  clearTimeout(fadeTimer);
+  if (changed && !instant) {
+    $("fade").classList.add("on");
+    fadeTimer = setTimeout(() => { swap(); $("fade").classList.remove("on"); }, 300);
+  } else swap();
+  $("caption").textContent = s[lang];
+  [...$("dots").children].forEach((d, k) => d.setAttribute("aria-current", k === i));
+  $("bPrev").disabled = i === 0;
+  $("bNext").disabled = i === SCENES.length - 1;
+  if (playing) narrate(); else stopAudio();
+}
+
+/* ---------- voice: recorded file first, device voice as backup ---------- */
+let curAudio = null;
+function stopAudio() {
+  token++;
+  clearTimeout(timer);
+  if (curAudio) { curAudio.onended = curAudio.onerror = null; curAudio.pause(); curAudio = null; }
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+}
+function pickVoice(code) {
+  if (!("speechSynthesis" in window)) return null;
+  const vs = speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith(code));
+  return vs.find(v => /google|natural|samantha|yuna|siri/i.test(v.name)) || vs[0] || null;
+}
+function speakTTS(text, onend) {
+  if (!("speechSynthesis" in window)) { if (onend) onend(); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang === "ko" ? "ko-KR" : "en-US";
+  const v = pickVoice(lang); if (v) u.voice = v;
+  u.rate = lang === "ko" ? 0.95 : 0.9; u.pitch = 1.15;
+  if (onend) { u.onend = onend; u.onerror = onend; }
+  speechSynthesis.speak(u);
+}
+function playLine(id, text, onend) {
+  const f = pack && pack.files && pack.files[id];
+  if (f) {
+    const a = new Audio("audio/" + f);
+    curAudio = a;
+    let fell = false;
+    const fallback = () => { if (fell || curAudio !== a) return; fell = true; speakTTS(text, onend); };
+    a.onended = () => { if (curAudio === a && onend) onend(); };
+    a.onerror = fallback;
+    a.play().catch(fallback);
+  } else speakTTS(text, onend);
+}
+function narrate() {
+  stopAudio();
+  const my = token, text = SCENES[idx][lang];
+  const advance = () => { if (my !== token || !playing) return; token++; timer = setTimeout(nextAuto, 1200); };
+  if (voice) {
+    setTimeout(() => { if (my === token) playLine(`n-${lang}-${pad2(idx + 1)}`, text, advance); }, 350);
+    timer = setTimeout(advance, Math.max(14000, text.length * (lang === "ko" ? 260 : 150)));
+  } else timer = setTimeout(advance, Math.max(5500, text.length * (lang === "ko" ? 120 : 70)));
+}
+function say(id, text) { if (!voice) return; stopAudio(); playLine(id, text); }
+function nextAuto() { if (idx < SCENES.length - 1) show(idx + 1); else setPlaying(false); }
+function setPlaying(p) {
+  playing = p;
+  $("bPlay").textContent = p ? UI[lang].pause : UI[lang].play;
+  if (p) { if (idx === SCENES.length - 1) show(0); else show(idx, true); }
+  else { stopAudio(); $("endbtns").classList.toggle("on", !!SCENES[idx].end); }
+}
+$("bStart").onclick = () => { $("start").classList.remove("on"); setPlaying(true); };
+$("bPlay").onclick = () => setPlaying(!playing);
+$("bPrev").onclick = () => { if (idx > 0) show(idx - 1); };
+$("bNext").onclick = () => { if (idx < SCENES.length - 1) show(idx + 1); };
+$("bReplay").onclick = () => { playing = true; applyUI(); show(0); };
+$("bEn").onclick = () => { lang = "en"; applyUI(); show(idx, true); if (quizOpen) renderQ(); };
+$("bKo").onclick = () => { lang = "ko"; applyUI(); show(idx, true); if (quizOpen) renderQ(); };
+$("bVoice").onclick = () => { voice = !voice; applyUI(); if (playing) narrate(); else stopAudio(); };
+
+let qi = 0, quizOpen = false, solved = false;
+function quizSpoken(q, l) { return q[l].q + " " + (l === "en" ? q.en.o.slice(0, -1).join(", ") + ", or " + q.en.o.slice(-1) + "?" : q.ko.o.join(", ") + "?"); }
+function renderQ() {
+  const t = UI[lang], q = QUIZ[qi], d = q[lang];
+  $("qCount").textContent = `${t.q} ${qi + 1} ${t.of} ${QUIZ.length}`;
+  $("qText").textContent = d.q; $("qFeed").textContent = ""; $("qNext").style.display = "none"; solved = false;
+  const box = $("qOpts"); box.innerHTML = "";
+  d.o.forEach((o, k) => {
+    const b = document.createElement("button"); b.textContent = o;
+    b.onclick = () => {
+      if (solved) return;
+      if (k === q.a) { b.classList.add("right"); $("qFeed").textContent = t.right; say(`fb-${lang}-right`, t.right); solved = true; $("qNext").textContent = qi < QUIZ.length - 1 ? t.qnext : t.done; $("qNext").style.display = "inline-block"; $("qNext").focus(); }
+      else { b.classList.add("wrong"); $("qFeed").textContent = t.wrong; say(`fb-${lang}-wrong`, t.wrong); }
+    };
+    box.appendChild(b);
+  });
+  say(`q-${lang}-${qi + 1}`, quizSpoken(q, lang));
+}
+$("bQuiz").onclick = () => { stopAudio(); playing = false; applyUI(); qi = 0; quizOpen = true; $("quiz").classList.add("on"); renderQ(); };
+$("qNext").onclick = () => {
+  if (qi < QUIZ.length - 1) { qi++; renderQ(); return; }
+  const t = UI[lang];
+  $("qCount").textContent = t.score; $("qText").textContent = ""; $("qOpts").innerHTML = ""; $("qFeed").textContent = ""; $("qNext").style.display = "none";
+  say(`fb-${lang}-score`, t.score);
+  const c = document.createElement("button"); c.textContent = t.close;
+  c.onclick = () => { stopAudio(); $("quiz").classList.remove("on"); quizOpen = false; };
+  $("qOpts").appendChild(c);
+};
+document.addEventListener("keydown", e => { if (e.key === "Escape" && quizOpen) { stopAudio(); $("quiz").classList.remove("on"); quizOpen = false; } });
+
+applyUI();
+show(0, true);
+</script>
+</body>
+</html>
