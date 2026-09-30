@@ -6,6 +6,7 @@
 
 - `index.html` : 영화 화면
 - `story.js` : 이야기 문장, 퀴즈, 화면 글자 (영화와 녹음실이 함께 씁니다)
+- `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png` : 브라우저 탭과 홈 화면 아이콘
 - `record/` : 녹음실 (사람 목소리 녹음, Gemini AI 목소리 만들기)
 - `audio/` : 녹음 파일과 `manifest.json`
 
