@@ -1,3 +1,23 @@
 {
-  "files": {}
+  "updated": "2026-09-30T19:36:23.408Z",
+  "files": {
+    "n-en-01": "n-en-01.wav",
+    "n-en-02": "n-en-02.wav",
+    "n-en-03": "n-en-03.wav",
+    "n-en-04": "n-en-04.wav",
+    "n-en-05": "n-en-05.wav",
+    "n-en-06": "n-en-06.wav",
+    "n-en-07": "n-en-07.wav",
+    "n-en-08": "n-en-08.wav",
+    "n-en-09": "n-en-09.wav",
+    "n-en-10": "n-en-10.wav",
+    "n-en-11": "n-en-11.wav",
+    "n-en-12": "n-en-12.wav",
+    "q-en-1": "q-en-1.wav",
+    "q-en-2": "q-en-2.wav",
+    "q-en-3": "q-en-3.wav",
+    "fb-en-right": "fb-en-right.wav",
+    "fb-en-wrong": "fb-en-wrong.wav",
+    "fb-en-score": "fb-en-score.wav"
+  }
 }
